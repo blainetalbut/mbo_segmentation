@@ -1,0 +1,5 @@
+A python implementation of graph MBO for image segmentation.
+
+sources: 
+https://www.math.ucla.edu/~bertozzi/papers/MBOgraphsFinal.pdf
+https://www.math.ucla.edu/~bertozzi/papers/ICIP-MBO-2014.pdf
