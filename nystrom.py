@@ -48,7 +48,7 @@ def nystrom(g, l=None):
         print('dy contains nan')
     sx = np.sqrt(dx)
     sy = np.sqrt(dy)
-    print('sx = {0}, sy = {1}'.format(sx,sy))
+    # print('sx = {0}, sy = {1}'.format(sx,sy))
 
 
     if np.isnan(sx).any():
@@ -79,13 +79,12 @@ def nystrom(g, l=None):
     # print('gam = {}'.format(gam))
 
     vmat = np.concatenate((
-            bx @ np.diag(np.sqrt(d)) @ bxt @ a @ np.linalg.inv(np.diag(np.sqrt(gam))),
-            ww_xy.transpose() @ bx @ np.linalg.inv(np.diag(np.sqrt(d))) @ bxt @ a @ np.linalg.inv(np.diag(np.sqrt(gam))) ))
-    vecs = [np.atleast_2d(v).T for v in vmat.transpose() ]
+        bx @ np.diag(np.sqrt(d)) @ bxt @ a @ np.linalg.inv(np.diag(np.sqrt(gam))),
+        ww_xy.transpose() @ bx @ np.linalg.inv(np.diag(np.sqrt(d))) @ bxt @ a @ np.linalg.inv(np.diag(np.sqrt(gam))) ))
     vals = gam
     
 
-    return vecs, vals
+    return vmat, vals
 
 def test(size = 100):
     rm = np.random.rand(size,size)
@@ -116,15 +115,15 @@ def test(size = 100):
     print('m = {}'.format(m))
     print('approximation is {}'.format(approx))
 
-    xs = range(size)
-    ys = []
-    for x in xs:
-        lrm = m.copy()
-        lrm.resize((x,x))
-        lrm.resize((size,size))
-        ys.append(np.linalg.norm(m-lrm))
-    plt.plot(xs,ys)
-    plt.show()
+    # xs = range(size)
+    # ys = []
+    # for x in xs:
+        # lrm = m.copy()
+        # lrm.resize((x,x))
+        # lrm.resize((size,size))
+        # ys.append(np.linalg.norm(m-lrm))
+    # plt.plot(xs,ys)
+    # plt.show()
 
     # return vecs, s, m, approx
 
