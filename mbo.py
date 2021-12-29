@@ -11,18 +11,16 @@ def threshold(parr):
     for k in range(len(parr)):
         if parr[k] > 0:
             outarr[k] = 1
+        # elif parr[k] == 0:
+            # outarr[k] = 0
         else:
             outarr[k] = -1
     return outarr
 
 class MBO_segmenter:
 
-    def __init__(self, g, parr0 = None, num_eigenvecs = None, dt = 0.001, C = 10, stopcond = 1e-7):
+    def __init__(self, g, parr0 = None, num_eigenvecs = None, dt = 0.01, C = 10, stopcond = 1e-10):
         self.graph = g
-        if parr0:
-            self.parr0 = parr0
-        else:
-            self.parr0 = np.zeros(g.shape[0])
         if num_eigenvecs:
             self.num_eigenvecs = num_eigenvecs
         else:
@@ -33,7 +31,7 @@ class MBO_segmenter:
 
         self.eigenvecs, self.eigenvals = nystrom.nystrom(self.graph, self.num_eigenvecs)
 
-        if parr0:
+        if not(parr0 is None):
             self.parr0 = parr0
         else:
             self.parr0 = threshold(self.eigenvecs[:,1])
@@ -49,10 +47,11 @@ class MBO_segmenter:
         parr = np.array(self.parr0)
 
         outwarr = np.divide(warr - self.dt * darr, 1 + self.dt * lambarr)
-        for x in range(len(lambarr)):
+        for x in range(len(self.parr0)):
             parr[x] = np.sum(outwarr * eigenvarr[x,:])
         for k in range(len(warr)):
             outdarr[k] = np.sum(self.C * (parr - self.parr0) * eigenvarr[:, k])
+        print(parr)
 
         parr = threshold(parr)
         for k in range(len(warr)):
@@ -66,12 +65,15 @@ class MBO_segmenter:
 
         for k in range(len(lambarr)):
             warr[k] = np.sum(self.parr0 * eigenvarr[:, k])
+        print(warr)
         darr = np.zeros(len(lambarr))
 
-        warr, darr, parr = self.heatflow_step(warr, darr)
-
-        while np.sum( (parr - self.parr0) ** 2) / np.sum(parr ** 2) >= self.stopcond :
+        error = 2 * self.stopcond
+        old_parr = self.parr0
+        while error  >= self.stopcond :
             warr, darr, parr = self.heatflow_step(warr, darr)
+            print(error)
+            error = np.sum( (parr - old_parr) ** 2) / np.sum(parr ** 2)
+            old_parr = parr
             
         return parr
-

@@ -22,11 +22,12 @@ def nystrom(g, l=None):
     if l > n:
         l=n
 
-    # samples = random.sample(range(n), l)
-    # samples.sort() # for convenience
-    # for now let's just take the first l entries, since the input is random anyway
-    samples = range(l)
+    samples = random.sample(range(n), l)
+    samples.sort() # for convenience
+    # # for now let's just take the first l entries, since the input is random anyway
+    # samples = range(l)
     leftovers = [ i for i in range(n) if i not in samples]
+    index = np.argsort(samples + leftovers)
 
     w_xx = np.array( [[g[i,j] for j in samples] for i in samples] )
     # print('w_xx = {}'.format(w_xx))
@@ -84,7 +85,7 @@ def nystrom(g, l=None):
     vals = gam
     
 
-    return vmat, vals
+    return np.array([[vmat[i,j] for j in range(vmat.shape[1]) ] for i in index ]), vals
 
 def test(size = 100):
     rm = np.random.rand(size,size)
@@ -126,4 +127,3 @@ def test(size = 100):
     # plt.show()
 
     # return vecs, s, m, approx
-
