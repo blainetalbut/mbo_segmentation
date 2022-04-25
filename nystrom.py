@@ -20,6 +20,7 @@ def nystrom(g, l=None):
     if not l:
         l = int(math.sqrt(n))
     if l > n:
+        raise Warning("number of eienvectors exceeds size of matrix; setting l=n")
         l=n
 
     samples = random.sample(range(n), l)
@@ -87,7 +88,7 @@ def nystrom(g, l=None):
 
     return np.array([[vmat[i,j] for j in range(vmat.shape[1]) ] for i in index ]), vals
 
-def test(size = 100):
+def test(size = 100, num_eigenvectors = None):
     rm = np.random.rand(size,size)
 
     # we calculate the standard deviation
@@ -100,21 +101,23 @@ def test(size = 100):
     # m = np.diag([1] * size)
     # print('m = {}'.format(m))
     # print(np.linalg.det(m))
-    vecs, vals = nystrom(m)
-    a, d, at = np.linalg.svd(m)
+    vecs, vals = nystrom(m, num_eigenvectors)
+
+    # a, d, at = np.linalg.svd(m)
     # print('actual eigenvalues are {}'.format(d))
     # print('reported: {}'.format(vals))
     # for i in range(len(vecs)):
         # print(np.linalg.det(m - np.diag([vals[i]]*size)))
         # # errs = [ abs(x - vals[i]) for x in np.divide(m @ vecs[i], vecs[i]) ]
         # # print('For {0}th eigenvalue, error is {1}'.format(i, max(errs)))
-    s = np.concatenate(vecs, 1)
     # print(vecs)
     # print(s.shape)
-    approx = s @ np.diag(vals) @ s.T
-    print('frobenius error = {}'.format(np.linalg.norm(m - approx)))
-    print('m = {}'.format(m))
-    print('approximation is {}'.format(approx))
+    approx = vecs @ np.diag(vals) @ vecs.T
+    error = np.linalg.norm(m-approx)
+    print(f'frobenius error = {error}')
+    print(f'percent error = {100 * error/np.linalg.norm(m)}%')
+    # print('m = {}'.format(m))
+    # print('approximation is {}'.format(approx))
 
     # xs = range(size)
     # ys = []
